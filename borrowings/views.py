@@ -25,7 +25,8 @@ from books.models import Book
 @extend_schema_view(
     list=extend_schema(
         summary="List borrowings",
-        description="Returns borrowings. Non-admins see only their own. Admins see all or a specific user via user_id.",
+        description="Returns borrowings. Non-admins see only their own. "
+        "Admins see all or a specific user via user_id.",
         parameters=[
             OpenApiParameter(
                 name="is_active",
@@ -53,7 +54,8 @@ from books.models import Book
     ),
     create=extend_schema(
         summary="Create borrowing",
-        description="Creates a borrowing, attaches current user, and decreases book inventory by 1.",
+        description="Creates a borrowing, attaches current user,"
+        " and decreases book inventory by 1.",
         request=BorrowingCreateSerializer,
         responses={
             201: BorrowingReadSerializer,
