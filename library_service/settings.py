@@ -9,6 +9,7 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
+    "books",
     "users",
     "rest_framework",
     "drf_spectacular",
