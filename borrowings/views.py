@@ -9,12 +9,60 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from rest_framework import permissions, status, viewsets, serializers
+from drf_spectacular.utils import (
+    extend_schema,
+    extend_schema_view,
+    OpenApiParameter,
+    OpenApiTypes,
+    OpenApiResponse,
+)
 
 from borrowings.models import Borrowing
 from borrowings.serializers import BorrowingReadSerializer, BorrowingCreateSerializer
 from books.models import Book
 
 
+@extend_schema_view(
+    list=extend_schema(
+        summary="List borrowings",
+        description="Returns borrowings. Non-admins see only their own. Admins see all or a specific user via user_id.",
+        parameters=[
+            OpenApiParameter(
+                name="is_active",
+                type=OpenApiTypes.BOOL,
+                location=OpenApiParameter.QUERY,
+                description="Filter by active borrowings (true/false)",
+            ),
+            OpenApiParameter(
+                name="user_id",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.QUERY,
+                description="Admin-only: filter by user id",
+            ),
+        ],
+        responses={200: BorrowingReadSerializer},
+        tags=["Borrowings"],
+    ),
+    retrieve=extend_schema(
+        summary="Retrieve borrowing",
+        responses={
+            200: BorrowingReadSerializer,
+            404: OpenApiResponse(description="Not found"),
+        },
+        tags=["Borrowings"],
+    ),
+    create=extend_schema(
+        summary="Create borrowing",
+        description="Creates a borrowing, attaches current user, and decreases book inventory by 1.",
+        request=BorrowingCreateSerializer,
+        responses={
+            201: BorrowingReadSerializer,
+            400: OpenApiResponse(description="Validation error"),
+            404: OpenApiResponse(description="Book not found"),
+        },
+        tags=["Borrowings"],
+    ),
+)
 class BorrowingViewSet(viewsets.ModelViewSet):
     queryset = Borrowing.objects.select_related("book", "user")
     permission_classes = [permissions.IsAuthenticated]
