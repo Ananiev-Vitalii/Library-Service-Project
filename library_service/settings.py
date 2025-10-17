@@ -1,8 +1,20 @@
+import os
+from dotenv import load_dotenv
 from pathlib import Path
+from django.core.exceptions import ImproperlyConfigured
 
+load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = "django-insecure-i82fd7qqj)*v2!p177g3#65yd-gqxi8a*9z*36dax7-*#&__yi"
+
+def get_env(name: str) -> str:
+    val = os.environ.get(name)
+    if not val:
+        raise ImproperlyConfigured(f"Missing required environment variable: {name}")
+    return val
+
+
+SECRET_KEY = get_env("DJANGO_SECRET_KEY")
 
 DEBUG = True
 
